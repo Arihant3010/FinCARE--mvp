@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Basic Profile - FinCARE</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDGeRJkrzIjtM51OFu8_58nAlxAof0QK98",
+            authDomain: "fincare-project-4015e.firebaseapp.com",
+            projectId: "fincare-project-4015e",
+            storageBucket: "fincare-project-4015e.firebasestorage.app",
+            messagingSenderId: "415209492661",
+            appId: "1:415209492661:web:683ea15a1e177fb4c52efc",
+            measurementId: "G-DNG4ZMXG1J"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                const userRef = doc(db, "users", user.uid);
+                // Real-time listener for profile data
+                onSnapshot(userRef, (docSnap) => {
+                    if (docSnap.exists()) {
+                        const data = docSnap.data();
+                        
+                        // Updating Header Name
+                        document.getElementById('header-name').innerText = data.fullName || "User";
+                        
+                        // Updating Personal Details
+                        document.getElementById('val-fullname').innerText = data.fullName || "N/A";
+                        document.getElementById('val-age').innerText = (data.age || "N/A") + " Years";
+                        document.getElementById('val-city').innerText = data.city || "N/A";
+
+                        // Updating Professional Details
+                        document.getElementById('val-employment').innerText = data.employment || "N/A";
+                        document.getElementById('val-marital').innerText = data.maritalStatus || "N/A";
+                    }
+                });
+            } else { window.location.href = "login.html"; }
+        });
+    </script>
+
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#f2cc0d",
+                        "background-dark": "#000000",
+                        "surface-dark": "#181711",
+                        "border-dark": "#2a281d",
+                        "muted-gold": "#bab59c"
+                    },
+                    fontFamily: { "display": ["Manrope", "sans-serif"] },
+                },
+            },
+        }
+    </script>
+
+    <style>
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        body { min-height: 100dvh; background-color: #000; }
+        .ios-scroll-hide::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body class="bg-background-dark font-display text-white">
+<div class="relative mx-auto h-[844px] w-[390px] overflow-hidden bg-background-dark shadow-2xl border-4 border-[#333] rounded-[3rem] flex flex-col">
+    <div class="flex items-center justify-between px-8 pt-4 text-sm font-semibold text-white shrink-0">
+        <span>9:41</span>
+        <div class="flex items-center gap-1.5">
+            <span class="material-symbols-outlined !text-[18px]">signal_cellular_alt</span>
+            <span class="material-symbols-outlined !text-[18px]">wifi</span>
+            <span class="material-symbols-outlined !text-[18px]">battery_full</span>
+        </div>
+    </div>
+
+    <div class="flex-1 overflow-y-auto ios-scroll-hide px-6 pt-4 pb-24">
+        <header class="flex items-center gap-4 mb-8">
+            <a href="profile.html" class="w-10 h-10 rounded-full bg-surface-dark flex items-center justify-center border border-border-dark">
+                <span class="material-symbols-outlined text-white">arrow_back_ios_new</span>
+            </a>
+            <h2 class="text-xl font-bold">Basic Profile</h2>
+        </header>
+
+        <div class="flex flex-col items-center mb-10">
+            <div class="relative mb-4">
+                <div class="w-24 h-24 rounded-full bg-surface-dark border-2 border-primary flex items-center justify-center overflow-hidden">
+                    <img alt="User" class="w-full h-full object-cover" src="https://ui-avatars.com/api/?name=User&background=181711&color=f2cc0d"/>
+                </div>
+            </div>
+            <h1 id="header-name" class="text-2xl font-bold text-white tracking-tight">Loading...</h1>
+            <p class="text-muted-gold text-xs uppercase font-bold tracking-widest mt-1">Member since Jan 2024</p>
+        </div>
+
+        <div class="mb-8">
+            <h3 class="text-muted-gold text-[10px] font-bold uppercase tracking-widest mb-3 px-1">Personal Details</h3>
+            <div class="bg-surface-dark border border-border-dark rounded-2xl overflow-hidden divide-y divide-border-dark">
+                <div class="p-4">
+                    <p class="text-primary text-[10px] font-bold uppercase tracking-widest mb-1">Full Name</p>
+                    <p id="val-fullname" class="text-white font-semibold">...</p>
+                </div>
+                <div class="p-4">
+                    <p class="text-primary text-[10px] font-bold uppercase tracking-widest mb-1">Age</p>
+                    <p id="val-age" class="text-white font-semibold">...</p>
+                </div>
+                <div class="p-4">
+                    <p class="text-primary text-[10px] font-bold uppercase tracking-widest mb-1">City</p>
+                    <p id="val-city" class="text-white font-semibold">...</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-8">
+            <h3 class="text-muted-gold text-[10px] font-bold uppercase tracking-widest mb-3 px-1">Professional Details</h3>
+            <div class="bg-surface-dark border border-border-dark rounded-2xl overflow-hidden divide-y divide-border-dark">
+                <div class="p-4">
+                    <p class="text-primary text-[10px] font-bold uppercase tracking-widest mb-1">Employment Type</p>
+                    <p id="val-employment" class="text-white font-semibold">...</p>
+                </div>
+                <div class="p-4">
+                    <p class="text-primary text-[10px] font-bold uppercase tracking-widest mb-1">Marital Status</p>
+                    <p id="val-marital" class="text-white font-semibold">...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="absolute bottom-0 w-full bg-background-dark border-t border-border-dark px-6 pb-8 pt-3 flex justify-between items-center shrink-0">
+        <a class="flex flex-col items-center gap-1 text-muted-gold" href="dashboard.html"><span class="material-symbols-outlined">dashboard</span><span class="text-[10px]">Dashboard</span></a>
+        <a class="flex flex-col items-center gap-1 text-muted-gold" href="insights.html"><span class="material-symbols-outlined">analytics</span><span class="text-[10px]">Insights</span></a>
+        <a class="flex flex-col items-center gap-1 text-muted-gold" href="transactions.html"><span class="material-symbols-outlined">receipt_long</span><span class="text-[10px]">Transactions</span></a>
+        <a class="flex flex-col items-center gap-1 text-primary" href="profile.html"><span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">person</span><span class="text-[10px]">Profile</span></a>
+    </div>
+    <div class="absolute bottom-2 left-1/2 -translate-x-1/2 w-32 h-1.5 bg-white/20 rounded-full pointer-events-none"></div>
+</div>
+</body>
+</html>

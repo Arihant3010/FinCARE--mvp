@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>FinCARE Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyDGeRJkrzIjtM51OFu8_58nAlxAof0QK98",
+        authDomain: "fincare-project-4015e.firebaseapp.com",
+        projectId: "fincare-project-4015e",
+        storageBucket: "fincare-project-4015e.firebasestorage.app",
+        messagingSenderId: "415209492661",
+        appId: "1:415209492661:web:683ea15a1e177fb4c52efc",
+        measurementId: "G-DNG4ZMXG1J"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            const userRef = doc(db, "users", user.uid);
+            
+            onSnapshot(userRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    
+                    // 1. Name Update
+                    document.getElementById('display-name').innerText = data.fullName ? data.fullName.split(' ')[0] : 'User';
+                    
+                    // 2. Total Balance Update
+                    const bankBalance = parseFloat(data.financials?.bankBalance) || 0;
+                    document.getElementById('display-balance').innerText = '₹' + bankBalance.toLocaleString('en-IN');
+
+                    // 2.1 Monthly Income Update
+                    const monthlyIncome = parseFloat(data.financials?.monthlyIncome) || 0;
+                    document.getElementById('display-monthly-income').innerText = '₹' + monthlyIncome.toLocaleString('en-IN');
+
+                    // 3. Fixed Costs Update
+                    let totalFixed = 0;
+                    if(data.obligations) {
+                        Object.values(data.obligations).forEach(val => totalFixed += (parseFloat(val.amount) || 0));
+                    }
+                    document.getElementById('display-fixed').innerText = '₹' + totalFixed.toLocaleString('en-IN');
+
+                    // 4. Goals Update
+                    const monthlyGoalSave = parseFloat(data.monthlyFixDeduction) || 0;
+                    document.getElementById('display-goals').innerText = '₹' + monthlyGoalSave.toLocaleString('en-IN'); 
+
+                    // 5. Savings Update
+                    const savingsBuffer = parseFloat(data.safetyNet?.monthlyFixSaving) || 0;
+                    document.getElementById('display-savings').innerText = '₹' + savingsBuffer.toLocaleString('en-IN');
+
+                    // 6. Spendable Calculation (Formula: Income - Fixed - Goals - Savings)
+                    const spendableBalance = monthlyIncome - totalFixed - monthlyGoalSave - savingsBuffer;
+                    document.getElementById('display-spendable').innerText = '₹' + (spendableBalance > 0 ? spendableBalance : 0).toLocaleString('en-IN');
+                    
+                    // 7. Dynamic Allocation Bars Logic
+                    if (monthlyIncome > 0) {
+                        const fixedWidth = (totalFixed / monthlyIncome) * 100;
+                        const goalsWidth = (monthlyGoalSave / monthlyIncome) * 100;
+                        const savingsWidth = (savingsBuffer / monthlyIncome) * 100;
+                        
+                        document.getElementById('bar-fixed').style.width = Math.min(fixedWidth, 100) + '%';
+                        document.getElementById('bar-goals').style.width = Math.min(goalsWidth, 100) + '%';
+                        document.getElementById('bar-savings').style.width = Math.min(savingsWidth, 100) + '%';
+                        document.getElementById('bar-spendable').style.width = Math.max(0, 100 - fixedWidth - goalsWidth - savingsWidth) + '%';
+                    }
+                }
+            });
+        } else {
+            window.location.href = "login.html";
+        }
+    });
+
+    window.showAIAnalysis = function() {
+        document.getElementById('dashboard-screen').style.display = 'none';
+        document.getElementById('chat-screen').style.display = 'flex';
+    };
+
+    window.showDashboard = function() {
+        document.getElementById('dashboard-screen').style.display = 'flex';
+        document.getElementById('chat-screen').style.display = 'none';
+    };
+</script>
+
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#EAB308",
+                        "background-dark": "#0A0A0B",
+                        "accent-green": "#4ADE80",
+                    },
+                    fontFamily: {
+                        display: ["Inter", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "12px",
+                    },
+                },
+            },
+        };
+    </script>
+<style type="text/tailwindcss">
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0A0A0B;
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .geometric-bg {
+            background-color: #0A0A0B;
+            position: relative;
+            overflow: hidden;
+        }
+        .shape {
+            position: absolute;
+            background: linear-gradient(135deg, rgba(31, 41, 55, 0.4) 0%, rgba(10, 10, 11, 0) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .shape-1 {
+            width: 300px; height: 300px;
+            top: -50px; right: -100px;
+            transform: rotate(15deg);
+        }
+        .shape-2 {
+            width: 400px; height: 400px;
+            bottom: -150px; left: -150px;
+            transform: rotate(-25deg);
+        }
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+        }
+        #chat-screen {
+            display: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-dark text-white antialiased">
+<div class="max-w-[430px] h-[932px] mx-auto overflow-hidden relative shadow-2xl bg-black geometric-bg border-x border-gray-900">
+<div class="h-full flex flex-col" id="dashboard-screen">
+<div class="absolute inset-0 z-0 pointer-events-none opacity-50">
+<div class="shape shape-1 rounded-[60px]"></div>
+<div class="shape shape-2 rounded-[80px]"></div>
+</div>
+<div class="relative z-20 flex justify-between items-end px-8 pt-4 pb-1">
+<span class="text-xs font-semibold">10:45</span>
+<div class="flex space-x-1.5 items-center">
+<span class="material-symbols-outlined text-[16px]">signal_cellular_alt</span>
+<span class="material-symbols-outlined text-[16px]">wifi</span>
+<span class="material-symbols-outlined text-[16px]">battery_full</span>
+</div>
+</div>
+<header class="relative z-20 px-6 py-4 flex items-center justify-between">
+<button class="w-10 h-10 flex items-center justify-center rounded-full glass-card hover:bg-white/10 transition-colors">
+<span class="material-symbols-outlined text-white">chevron_left</span>
+</button>
+<h1 class="text-lg font-bold tracking-tight">
+                    Fin<span class="text-accent-green">CARE</span>
+</h1>
+<button class="w-10 h-10 flex items-center justify-center rounded-full glass-card hover:bg-white/10 transition-colors">
+<span class="material-symbols-outlined text-white">notifications</span>
+</button>
+</header>
+<main class="relative z-10 px-6 pt-4 flex-1 overflow-y-auto no-scrollbar pb-32">
+<div class="mb-8">
+<h2 class="text-2xl font-bold">Hello, <span id="display-name" class="text-primary">Alex!</span></h2>
+<p class="text-slate-400 text-sm mt-1">Your AI is optimizing your income today.</p>
+</div>
+<div class="space-y-4">
+<div class="glass-card p-6 rounded-3xl relative overflow-hidden">
+<div class="absolute -right-4 -top-4 w-24 h-24 bg-primary/10 rounded-full blur-2xl"></div>
+<p class="text-slate-400 text-xs font-medium uppercase tracking-wider mb-1">Total Balance</p>
+<h3 id="display-balance" class="text-3xl font-bold mb-4">₹0</h3>
+<div class="flex items-center space-x-2">
+<span class="flex items-center text-accent-green text-xs font-semibold bg-accent-green/10 px-2 py-1 rounded-full">
+<span class="material-symbols-outlined text-[14px] mr-1">trending_up</span>
+                                +4.5%
+                            </span>
+<span class="text-slate-500 text-xs">vs last month</span>
+</div>
+</div>
+
+<div class="glass-card p-6 rounded-3xl border-l-4 border-primary">
+    <div class="flex items-center justify-between">
+        <div>
+            <p class="text-slate-400 text-xs font-medium uppercase tracking-wider mb-1">Monthly Income</p>
+            <h3 id="display-monthly-income" class="text-3xl font-bold">₹0</h3>
+        </div>
+        <div class="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center">
+            <span class="material-symbols-outlined text-primary text-2xl">payments</span>
+        </div>
+    </div>
+</div>
+
+<a class="block w-full text-left bg-primary/10 border border-primary/20 p-5 rounded-3xl flex items-start space-x-4 active:scale-[0.98] transition-transform" href="aisuggestion.html">
+<div class="bg-primary/20 p-3 rounded-2xl flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">psychology</span>
+</div>
+<div class="flex-1">
+<div class="flex items-center justify-between">
+<h4 class="text-primary font-semibold text-sm">AI Suggestion</h4>
+<span class="material-symbols-outlined text-primary/50 text-sm">arrow_forward_ios</span>
+</div>
+<p class="text-xs text-slate-300 mt-1 leading-relaxed">
+                                You can save more this month by optimizing your bills and fixed costs.
+                            </p>
+</div>
+</a>
+<div class="grid grid-cols-2 gap-4">
+<a class="glass-card p-4 rounded-3xl block active:bg-white/10 transition-colors" href="fixed.html">
+<div class="w-8 h-8 bg-blue-500/20 rounded-xl flex items-center justify-center mb-3">
+<span class="material-symbols-outlined text-blue-400 text-lg">calendar_today</span>
+</div>
+<p class="text-slate-400 text-[10px] uppercase font-bold tracking-widest">Fixed</p>
+<p id="display-fixed" class="text-lg font-bold">₹0</p>
+</a>
+<a class="glass-card p-4 rounded-3xl block active:bg-white/10 transition-colors" href="goal.html">
+<div class="w-8 h-8 bg-purple-500/20 rounded-xl flex items-center justify-center mb-3">
+<span class="material-symbols-outlined text-purple-400 text-lg">target</span>
+</div>
+<p class="text-slate-400 text-[10px] uppercase font-bold tracking-widest">Goals</p>
+<p id="display-goals" class="text-lg font-bold">₹0</p>
+</a>
+<a class="glass-card p-4 rounded-3xl block active:bg-white/10 transition-colors" href="saving.html">
+<div class="w-8 h-8 bg-emerald-500/20 rounded-xl flex items-center justify-center mb-3">
+<span class="material-symbols-outlined text-emerald-400 text-lg">account_balance_wallet</span>
+</div>
+<p class="text-slate-400 text-[10px] uppercase font-bold tracking-widest">Savings</p>
+<p id="display-savings" class="text-lg font-bold">₹0</p>
+</a>
+<a class="glass-card p-4 rounded-3xl block active:bg-white/10 transition-colors" href="spendable.html">
+<div class="w-8 h-8 bg-orange-500/20 rounded-xl flex items-center justify-center mb-3">
+<span class="material-symbols-outlined text-orange-400 text-lg">shopping_cart</span>
+</div>
+<p class="text-slate-400 text-[10px] uppercase font-bold tracking-widest">Spendable</p>
+<p id="display-spendable" class="text-lg font-bold">₹0</p>
+</a>
+</div>
+<div class="glass-card p-5 rounded-3xl">
+<div class="flex justify-between items-center mb-4">
+<h4 class="font-semibold text-sm">Monthly Allocation</h4>
+<span onclick="showAIAnalysis()" class="text-xs text-primary font-medium cursor-pointer">View Analysis</span>
+</div>
+<div class="flex h-3 w-full bg-white/5 rounded-full overflow-hidden">
+<div id="bar-fixed" class="h-full bg-blue-500 transition-all duration-1000" style="width: 0%"></div>
+<div id="bar-goals" class="h-full bg-purple-500 transition-all duration-1000" style="width: 0%"></div>
+<div id="bar-savings" class="h-full bg-emerald-500 transition-all duration-1000" style="width: 0%"></div>
+<div id="bar-spendable" class="h-full bg-orange-500 transition-all duration-1000" style="width: 0%"></div>
+</div>
+</div>
+</div>
+</main>
+<nav class="absolute bottom-0 left-0 right-0 z-30 px-6 pt-4 pb-10 glass-card border-t border-white/5 rounded-t-[32px]">
+<div class="flex justify-between items-center px-2">
+<a class="flex flex-col items-center space-y-1 text-primary" href="#">
+<span class="material-symbols-outlined fill-1">grid_view</span>
+<span class="text-[10px] font-bold">Dashboard</span>
+</a>
+<a class="flex flex-col items-center space-y-1 text-slate-500 hover:text-white transition-colors" href="insights.html">
+<span class="material-symbols-outlined">insights</span>
+<span class="text-[10px] font-medium">Insights</span>
+</a>
+<a class="flex flex-col items-center space-y-1 text-slate-500 hover:text-white transition-colors" href="transaction.html">
+<span class="material-symbols-outlined">receipt_long</span>
+<span class="text-[10px] font-medium">Transactions</span>
+</a>
+<a class="flex flex-col items-center space-y-1 text-slate-500 hover:text-white transition-colors" href="profile.html">
+<span class="material-symbols-outlined">person</span>
+<span class="text-[10px] font-medium">Profile</span>
+</a>
+</div>
+</nav>
+</div>
+<div class="h-full flex flex-col bg-black" id="chat-screen">
+<div class="relative z-20 flex justify-between items-end px-8 pt-4 pb-1">
+<span class="text-xs font-semibold">11:01</span>
+<div class="flex space-x-1.5 items-center">
+<span class="material-symbols-outlined text-[16px]">signal_cellular_alt</span>
+<span class="material-symbols-outlined text-[16px]">wifi</span>
+<span class="material-symbols-outlined text-[16px]">battery_full</span>
+</div>
+</div>
+<header class="px-6 py-4 flex items-center space-x-4 border-b border-white/5">
+<button onclick="showDashboard()" class="w-10 h-10 flex items-center justify-center rounded-full glass-card hover:bg-white/10 transition-colors">
+<span class="material-symbols-outlined text-white">chevron_left</span>
+</button>
+<div class="flex flex-col">
+<h2 class="font-bold text-sm">AI Assistant</h2>
+<span class="text-[10px] text-accent-green flex items-center">
+<span class="w-1.5 h-1.5 bg-accent-green rounded-full mr-1"></span>
+                        Always Active
+                    </span>
+</div>
+</header>
+<main class="flex-1 overflow-y-auto p-6 space-y-6 no-scrollbar">
+<div class="flex items-start space-x-3">
+<div class="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-primary text-sm">psychology</span>
+</div>
+<div class="bg-primary/10 border border-primary/10 p-4 rounded-2xl rounded-tl-none max-w-[85%]">
+<p class="text-sm leading-relaxed text-slate-200">
+                            Based on your current data, I've synced your Monthly Income and allocated it across your goals and obligations.
+                        </p>
+</div>
+</div>
+</main>
+<div class="p-6 bg-black/80 backdrop-blur-md pb-12">
+<div class="flex items-center space-x-3 glass-card p-2 px-4 rounded-2xl border-white/10">
+<input class="bg-transparent border-none focus:ring-0 text-sm flex-1 text-slate-300 placeholder:text-slate-600" placeholder="Ask anything about your finances..." type="text"/>
+<button class="w-8 h-8 bg-primary rounded-xl flex items-center justify-center">
+<span class="material-symbols-outlined text-black text-lg">arrow_upward</span>
+</button>
+</div>
+</div>
+</div>
+<div class="absolute bottom-2 left-1/2 -translate-x-1/2 w-32 h-1 bg-white/20 rounded-full z-50"></div>
+</div>
+</body></html>

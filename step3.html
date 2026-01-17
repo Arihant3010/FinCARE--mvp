@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Step 3: Fixed Obligations - FinCARE</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getFirestore, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyDGeRJkrzIjtM51OFu8_58nAlxAof0QK98",
+        authDomain: "fincare-project-4015e.firebaseapp.com",
+        databaseURL: "https://fincare-project-4015e-default-rtdb.firebaseio.com",
+        projectId: "fincare-project-4015e",
+        storageBucket: "fincare-project-4015e.firebasestorage.app",
+        messagingSenderId: "415209492661",
+        appId: "1:415209492661:web:683ea15a1e177fb4c52efc",
+        measurementId: "G-DNG4ZMXG1J"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // Security Check
+    onAuthStateChanged(auth, (user) => {
+        if (!user) window.location.href = "login.html";
+    });
+
+    async function saveObligations() {
+        const user = auth.currentUser;
+        if (!user) return;
+
+        const nextBtn = document.getElementById('nextBtn');
+        nextBtn.innerText = "Saving...";
+        nextBtn.style.pointerEvents = "none";
+
+        // Collecting all obligation data
+        const obligationsData = {
+            obligations: {
+                emi: {
+                    amount: parseFloat(document.getElementById('emi_amount').value) || 0,
+                    date: document.getElementById('emi_date').value || ""
+                },
+                bills: {
+                    amount: parseFloat(document.getElementById('bills_amount').value) || 0,
+                    date: document.getElementById('bills_date').value || ""
+                },
+                insurance: {
+                    amount: parseFloat(document.getElementById('insurance_amount').value) || 0,
+                    date: document.getElementById('insurance_date').value || ""
+                },
+                mediclaim: {
+                    amount: parseFloat(document.getElementById('mediclaim_amount').value) || 0,
+                    date: document.getElementById('mediclaim_date').value || ""
+                },
+                other: {
+                    amount: parseFloat(document.getElementById('other_amount').value) || 0,
+                    date: document.getElementById('other_date').value || ""
+                }
+            },
+            currentStep: 3,
+            lastUpdated: new Date()
+        };
+
+        try {
+            const userRef = doc(db, "users", user.uid);
+            await updateDoc(userRef, obligationsData);
+            window.location.href = "step4.html";
+        } catch (error) {
+            console.error("Error saving obligations:", error);
+            alert("Error saving data. Please try again.");
+            nextBtn.innerText = "Next";
+            nextBtn.style.pointerEvents = "auto";
+        }
+    }
+    window.saveObligations = saveObligations;
+</script>
+
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#f2cc0d",
+                        "background-dark": "#000000",
+                        "card-bg": "#121212",
+                        "border-muted": "#1f1f1f",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"]
+                    },
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        :root {
+            --primary: #f2cc0d;
+        }
+        body {
+            font-family: 'Manrope', sans-serif;
+            background-color: #000000;
+        }
+        .ios-blur {
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+        }
+        .card-solid {
+            background-color: #121212;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        input[type="date"] {
+            appearance: none;
+            -webkit-appearance: none;
+            min-height: 40px;
+            color-scheme: dark;
+        }
+    </style>
+</head>
+<body class="min-h-screen text-white font-display bg-black">
+<div class="relative flex flex-col h-screen max-w-md mx-auto overflow-hidden">
+<div class="flex-none items-center p-4 pt-6 justify-between flex z-10 bg-black">
+<a class="flex items-center justify-center w-10 h-10 rounded-full bg-white/5 border border-white/10 active:scale-90 transition-transform" href="step2.html">
+<span class="material-symbols-outlined text-lg pl-1">arrow_back_ios</span>
+</a>
+<div class="flex flex-col items-center">
+<span class="text-[9px] font-extrabold text-primary tracking-[0.2em] uppercase mb-0.5">Step 3 of 7</span>
+<h2 class="text-white text-[10px] font-bold uppercase tracking-widest opacity-50">Fixed Obligations</h2>
+</div>
+<div class="w-10"></div>
+</div>
+<div class="px-6 py-2 flex-none z-10 bg-black">
+<div class="flex justify-between items-center mb-2">
+<span class="text-white/40 text-[9px] font-bold uppercase tracking-[0.15em]">Onboarding Progress</span>
+<span class="text-primary text-[10px] font-black bg-primary/10 px-1.5 py-0.5 rounded border border-primary/20">42.8%</span>
+</div>
+<div class="h-1 w-full bg-white/5 rounded-full overflow-hidden border border-white/5">
+<div class="h-full bg-primary rounded-full shadow-[0_0_10px_rgba(242,204,13,0.5)]" style="width: 42.8%;"></div>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto px-6 pb-32 pt-2 scroll-container bg-black">
+<div class="pb-4">
+<h1 class="text-white text-2xl font-extrabold leading-[1.1] tracking-tight">
+                    Fixed <span class="text-primary italic">Obligations</span>
+</h1>
+<p class="text-white/50 text-xs mt-2 leading-relaxed">Set your monthly recurring costs.</p>
+</div>
+<div class="space-y-3">
+<div class="card-solid rounded-2xl p-4 space-y-3">
+<div class="flex items-center gap-3 border-b border-white/5 pb-2">
+<div class="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-base font-variation-fill">account_balance</span>
+</div>
+<h3 class="text-white font-bold text-[10px] uppercase tracking-widest">1. EMI</h3>
+</div>
+<div class="grid grid-cols-2 gap-3">
+<div class="space-y-1">
+<label class="text-white/40 text-[9px] font-bold uppercase tracking-wider ml-1">Amount</label>
+<input id="emi_amount" class="w-full bg-white/[0.03] border-white/10 rounded-xl h-10 px-3 text-white font-bold text-sm focus:outline-none" inputmode="decimal" placeholder="0.00" type="number"/>
+</div>
+<div class="space-y-1">
+<label class="text-white/40 text-[9px] font-bold uppercase tracking-wider ml-1">Date</label>
+<input id="emi_date" class="w-full bg-white/[0.03] border-white/10 rounded-xl h-10 px-3 text-white font-semibold text-xs focus:outline-none" type="date"/>
+</div>
+</div>
+</div>
+
+<div class="card-solid rounded-2xl p-4 space-y-3">
+<div class="flex items-center gap-3 border-b border-white/5 pb-2">
+<div class="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-base font-variation-fill">receipt_long</span>
+</div>
+<h3 class="text-white font-bold text-[10px] uppercase tracking-widest">2. Bills</h3>
+</div>
+<div class="grid grid-cols-2 gap-3">
+<div class="space-y-1">
+<label class="text-white/40 text-[9px] font-bold uppercase tracking-wider ml-1">Amount</label>
+<input id="bills_amount" class="w-full bg-white/[0.03] border-white/10 rounded-xl h-10 px-3 text-white font-bold text-sm focus:outline-none" placeholder="0.00" type="number"/>
+</div>
+<div class="space-y-1">
+<label class="text-white/40 text-[9px] font-bold uppercase tracking-wider ml-1">Date</label>
+<input id="bills_date" class="w-full bg-white/[0.03] border-white/10 rounded-xl h-10 px-3 text-white font-semibold text-xs focus:outline-none" type="date"/>
+</div>
+</div>
+</div>
+
+<div class="card-solid rounded-2xl p-4 space-y-3">
+<div class="flex items-center gap-3 border-b border-white/5 pb-2">
+<div class="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-base font-variation-fill">shield</span>
+</div>
+<h3 class="text-white font-bold text-[10px] uppercase tracking-widest">3. Insurance</h3>
+</div>
+<div class="grid grid-cols-2 gap-3">
+<div class="space-y-1">
+<label class="text-white/40 text-[9px] font-bold uppercase tracking-wider ml-1">Amount</label>
+<input id="insurance_amount" class="w-full bg-white/[0.03] border-white/10 rounded-xl h-10 px-3 text-white font-bold text-sm focus:outline-none" placeholder="0.00" type="number"/>
+</div>
+<div class="space-y-1">
+<label class="text-white/40 text-[9px] font-bold uppercase tracking-wider ml-1">Date</label>
+<input id="insurance_date" class="w-full bg-white/[0.03] border-white/10 rounded-xl h-10 px-3 text-white font-semibold text-xs focus:outline-none" type="date"/>
+</div>
+</div>
+</div>
+
+<div class="card-solid rounded-2xl p-4 space-y-3">
+<div class="flex items-center gap-3 border-b border-white/5 pb-2">
+<div class="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-base font-variation-fill">medical_services</span>
+</div>
+<h3 class="text-white font-bold text-[10px] uppercase tracking-widest">4. Mediclaim</h3>
+</div>
+<div class="grid grid-cols-2 gap-3">
+<div class="space-y-1">
+<label class="text-white/40 text-[9px] font-bold uppercase tracking-wider ml-1">Amount</label>
+<input id="mediclaim_amount" class="w-full bg-white/[0.03] border-white/10 rounded-xl h-10 px-3 text-white font-bold text-sm focus:outline-none" placeholder="0.00" type="number"/>
+</div>
+<div class="space-y-1">
+<label class="text-white/40 text-[9px] font-bold uppercase tracking-wider ml-1">Date</label>
+<input id="mediclaim_date" class="w-full bg-white/[0.03] border-white/10 rounded-xl h-10 px-3 text-white font-semibold text-xs focus:outline-none" type="date"/>
+</div>
+</div>
+</div>
+
+<div class="card-solid rounded-2xl p-4 space-y-3">
+<div class="flex items-center gap-3 border-b border-white/5 pb-2">
+<div class="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-base font-variation-fill">more_horiz</span>
+</div>
+<h3 class="text-white font-bold text-[10px] uppercase tracking-widest">5. Other</h3>
+</div>
+<div class="grid grid-cols-2 gap-3">
+<div class="space-y-1">
+<label class="text-white/40 text-[9px] font-bold uppercase tracking-wider ml-1">Amount</label>
+<input id="other_amount" class="w-full bg-white/[0.03] border-white/10 rounded-xl h-10 px-3 text-white font-bold text-sm focus:outline-none" placeholder="0.00" type="number"/>
+</div>
+<div class="space-y-1">
+<label class="text-white/40 text-[9px] font-bold uppercase tracking-wider ml-1">Date</label>
+<input id="other_date" class="w-full bg-white/[0.03] border-white/10 rounded-xl h-10 px-3 text-white font-semibold text-xs focus:outline-none" type="date"/>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="fixed bottom-0 left-0 right-0 p-6 pb-8 ios-blur bg-black/80 border-t border-white/10 z-20">
+<button id="nextBtn" onclick="saveObligations()" class="flex w-full items-center justify-center h-14 bg-primary text-black rounded-xl font-black text-base shadow-[0_10px_30px_rgba(242,204,13,0.3)] active:scale-95 transition-all overflow-hidden relative group max-w-md mx-auto">
+<span class="relative z-10 flex items-center uppercase tracking-wider">
+                    Next
+                    <span class="material-symbols-outlined ml-2 font-black group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</span>
+</button>
+</div>
+</div>
+</body>
+</html>

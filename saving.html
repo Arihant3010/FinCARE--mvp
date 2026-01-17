@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Savings &amp; Safety - FinCARE</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyDGeRJkrzIjtM51OFu8_58nAlxAof0QK98",
+        authDomain: "fincare-project-4015e.firebaseapp.com",
+        projectId: "fincare-project-4015e",
+        storageBucket: "fincare-project-4015e.firebasestorage.app",
+        messagingSenderId: "415209492661",
+        appId: "1:415209492661:web:683ea15a1e177fb4c52efc",
+        measurementId: "G-DNG4ZMXG1J"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            const userRef = doc(db, "users", user.uid);
+            onSnapshot(userRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    
+                    // Onboarding Step 4 data
+                    const emergencyBalance = parseFloat(data.safetyNet?.currentBalance) || 0;
+                    const monthlySaving = parseFloat(data.safetyNet?.monthlyFixSaving) || 0;
+                    
+                    // Update UI
+                    document.getElementById('display-total-pool').innerText = '₹' + emergencyBalance.toLocaleString('en-IN');
+                    document.getElementById('display-emergency-val').innerText = '₹' + emergencyBalance.toLocaleString('en-IN');
+                    document.getElementById('display-monthly-fix').innerText = '₹' + monthlySaving.toLocaleString('en-IN');
+                }
+            });
+        } else { window.location.href = "login.html"; }
+    });
+</script>
+
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#EAB308",
+                        "background-dark": "#000000",
+                        "accent-green": "#4ADE80",
+                    },
+                    fontFamily: {
+                        display: ["Inter", "sans-serif"],
+                    },
+                },
+            },
+        };
+    </script>
+<style type="text/tailwindcss">
+        body {
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+            background-color: #000000;
+        }
+        .ios-notch { height: 44px; }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .geometric-bg { background-color: #000000; position: relative; overflow: hidden; }
+        .shape { position: absolute; background: linear-gradient(135deg, rgba(31, 41, 55, 0.2) 0%, rgba(0, 0, 0, 0) 100%); border: 1px solid rgba(255, 255, 255, 0.03); }
+        .shape-1 { width: 300px; height: 300px; top: -50px; right: -100px; transform: rotate(15deg); }
+        .shape-2 { width: 400px; height: 400px; bottom: -150px; left: -150px; transform: rotate(-25deg); }
+    </style>
+</head>
+<body class="dark:bg-background-dark text-white antialiased">
+<div class="max-w-[430px] h-[932px] mx-auto overflow-hidden relative shadow-2xl bg-black geometric-bg border-x border-gray-900">
+<div class="absolute inset-0 z-0 pointer-events-none opacity-40">
+<div class="shape shape-1 rounded-[60px]"></div>
+<div class="shape shape-2 rounded-[80px]"></div>
+</div>
+<div class="ios-notch relative z-20 flex justify-between items-end px-8 pb-1">
+<span class="text-xs font-semibold">9:41</span>
+<div class="flex space-x-1.5 items-center text-white">
+<span class="material-symbols-outlined text-[14px]">signal_cellular_alt</span>
+<span class="material-symbols-outlined text-[14px]">wifi</span>
+<span class="material-symbols-outlined text-[14px]">battery_full</span>
+</div>
+</div>
+<header class="relative z-20 px-6 py-4 flex items-center justify-between">
+<a class="w-10 h-10 flex items-center justify-center rounded-full glass-card" href="dashboard.html">
+<span class="material-symbols-outlined text-white">chevron_left</span>
+</a>
+<h1 class="text-lg font-semibold tracking-tight text-white">Savings &amp; Safety</h1>
+<button class="w-10 h-10 flex items-center justify-center rounded-full glass-card">
+<span class="material-symbols-outlined text-white">more_horiz</span>
+</button>
+</header>
+
+<main class="relative z-10 px-6 pt-4 h-[calc(100%-180px)] overflow-y-auto no-scrollbar">
+<div class="text-center mb-8 pt-4">
+<p class="text-slate-400 text-sm font-medium mb-1 uppercase tracking-widest">Total Savings Pool</p>
+<h2 id="display-total-pool" class="text-5xl font-bold tracking-tight text-white">₹0</h2>
+<div class="inline-flex items-center mt-3 bg-accent-green/10 px-3 py-1 rounded-full border border-accent-green/20">
+<span class="material-symbols-outlined text-accent-green text-sm mr-1">shield</span>
+<span class="text-accent-green text-[11px] font-bold uppercase tracking-wider">Safety Net Active</span>
+</div>
+</div>
+
+<div class="space-y-4">
+<div class="glass-card p-5 rounded-[28px] flex items-center justify-between border-l-4 border-l-primary">
+    <div class="flex items-center space-x-4">
+        <div class="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center">
+            <span class="material-symbols-outlined text-primary text-3xl">event_repeat</span>
+        </div>
+        <div>
+            <h3 class="font-semibold text-lg text-white">Monthly Fix</h3>
+            <p class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Scheduled Auto-Save</p>
+        </div>
+    </div>
+    <div class="text-right">
+        <p id="display-monthly-fix" class="text-xl font-bold text-primary">₹0</p>
+        <p class="text-[9px] text-slate-500 font-bold uppercase">Per Month</p>
+    </div>
+</div>
+
+<div class="glass-card p-5 rounded-[28px] flex items-center justify-between border-l-4 border-l-accent-green">
+<div class="flex items-center space-x-4">
+<div class="w-14 h-14 bg-accent-green/10 rounded-2xl flex items-center justify-center">
+<span class="material-symbols-outlined text-accent-green text-3xl">medical_services</span>
+</div>
+<div>
+<h3 class="font-semibold text-lg text-white">Emergency Buffer</h3>
+<p class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Liquidity: High</p>
+</div>
+</div>
+<div class="text-right">
+<p id="display-emergency-val" class="text-xl font-bold text-white">₹0</p>
+<p class="text-[10px] text-accent-green font-bold uppercase tracking-wider">Healthy</p>
+</div>
+</div>
+
+<div class="bg-primary/5 border border-primary/20 p-5 rounded-[28px] mt-6">
+<div class="flex items-center space-x-2 mb-2">
+<span class="material-symbols-outlined text-primary text-xl">psychology</span>
+<span class="text-primary font-bold text-xs uppercase tracking-widest">AI Intelligence</span>
+</div>
+<p class="text-sm text-slate-300 leading-relaxed">
+    Your Emergency Buffer is optimized for your current profile. Your <span class="text-primary font-bold">Monthly Fix</span> saving ensures your safety net continues to grow automatically.
+</p>
+</div>
+
+<div class="pt-6">
+<div class="flex items-center justify-between mb-4 px-1">
+<h4 class="font-bold text-xs uppercase tracking-widest text-slate-500">Recent Movements</h4>
+<span class="text-primary text-[11px] font-bold uppercase cursor-pointer">See All</span>
+</div>
+<div class="space-y-3 pb-20">
+<div class="flex items-center justify-between py-3 px-1 border-b border-white/5">
+<div class="flex items-center space-x-3">
+<div class="w-9 h-9 rounded-xl bg-white/5 flex items-center justify-center">
+<span class="material-symbols-outlined text-sm">add</span>
+</div>
+<p class="text-sm font-medium text-white">Interest Credited</p>
+</div>
+<p class="text-sm font-bold text-accent-green">+₹28</p>
+</div>
+</div>
+</div>
+</div>
+</main>
+
+<nav class="absolute bottom-0 left-0 right-0 z-30 px-8 pt-4 pb-8 glass-card border-t border-white/5 rounded-t-[32px]">
+<div class="flex justify-between items-center px-2">
+<a class="flex flex-col items-center space-y-1 text-slate-500" href="dashboard.html">
+<span class="material-symbols-outlined">grid_view</span>
+<span class="text-[10px] font-medium">Dashboard</span>
+</a>
+<a class="flex flex-col items-center space-y-1 text-slate-500" href="#">
+<span class="material-symbols-outlined">insights</span>
+<span class="text-[10px] font-medium">Insights</span>
+</a>
+<div class="relative -top-6">
+<button class="w-14 h-14 bg-primary text-black rounded-2xl shadow-xl shadow-primary/30 flex items-center justify-center transform hover:scale-105 transition-transform active:scale-95">
+<span class="material-symbols-outlined text-2xl font-bold">add</span>
+</button>
+</div>
+<a class="flex flex-col items-center space-y-1 text-primary" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">account_balance_wallet</span>
+<span class="text-[10px] font-bold">Wallet</span>
+</a>
+<a class="flex flex-col items-center space-y-1 text-slate-500" href="profile.html">
+<span class="material-symbols-outlined">person</span>
+<span class="text-[10px] font-medium">Profile</span>
+</a>
+</div>
+</nav>
+<div class="absolute bottom-2 left-1/2 -translate-x-1/2 w-32 h-1.5 bg-white/20 rounded-full z-40"></div>
+</div>
+</body></html>
