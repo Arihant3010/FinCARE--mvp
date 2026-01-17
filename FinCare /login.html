@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>FinCARE - Login</title>
+
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography,container-queries"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+    // Your Firebase Config (Locked)
+    const firebaseConfig = {
+        apiKey: "AIzaSyDGeRJkrzIjtM51OFu8_58nAlxAof0QK98",
+        authDomain: "fincare-project-4015e.firebaseapp.com",
+        databaseURL: "https://fincare-project-4015e-default-rtdb.firebaseio.com",
+        projectId: "fincare-project-4015e",
+        storageBucket: "fincare-project-4015e.firebasestorage.app",
+        messagingSenderId: "415209492661",
+        appId: "1:415209492661:web:683ea15a1e177fb4c52efc",
+        measurementId: "G-DNG4ZMXG1J"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    // Login Function
+    async function handleLogin(event) {
+        event.preventDefault();
+        const email = document.getElementById('loginEmail').value;
+        const password = document.getElementById('loginPassword').value;
+        const loginBtn = document.getElementById('loginBtn');
+
+        loginBtn.innerText = "Authenticating...";
+        loginBtn.disabled = true;
+
+        try {
+            // Check if user exists and password is correct
+            await signInWithEmailAndPassword(auth, email, password);
+            
+            // Success -> Redirect to Dashboard
+            window.location.href = "dashboard.html";
+        } catch (error) {
+            alert("Login Failed: " + error.message);
+            loginBtn.innerText = "Login";
+            loginBtn.disabled = false;
+        }
+    }
+
+    // Attach to window so form can find it
+    window.handleLogin = handleLogin;
+</script>
+
+<script>
+tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      colors: {
+        primary: "#FFC107",
+        "background-light": "#F3F4F6",
+        "background-dark": "#0A0C10",
+        "input-dark": "#1F2937",
+        "accent-green": "#4ADE80"
+      },
+      fontFamily: {
+        display: ["Inter", "sans-serif"],
+      },
+      borderRadius: {
+        DEFAULT: "0.75rem",
+      },
+    },
+  },
+};
+</script>
+
+<style type="text/tailwindcss">
+.geometric-bg {
+  background-color: #000;
+  position: relative;
+  overflow: hidden;
+}
+.geometric-bg::before {
+  content: '';
+  position: absolute;
+  top: -10%;
+  left: -10%;
+  width: 120%;
+  height: 120%;
+  background: 
+    radial-gradient(circle at 10% 10%, rgba(31, 41, 55, 0.4) 0%, transparent 40%),
+    radial-gradient(circle at 90% 90%, rgba(31, 41, 55, 0.4) 0%, transparent 40%),
+    linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(0, 0, 0, 1) 100%);
+  z-index: 0;
+}
+.shape-layer {
+  position: absolute;
+  width: 200%;
+  height: 200%;
+  border: 1px solid rgba(255,255,255,0.05);
+  transform: rotate(45deg);
+  pointer-events: none;
+}
+.layer-1 {
+  top: -50%;
+  left: -50%;
+  border-radius: 40%;
+  background: linear-gradient(to bottom, rgba(31, 41, 55, 0.1), transparent);
+}
+.layer-2 {
+  top: -60%;
+  left: -40%;
+  border-radius: 35%;
+  border-color: rgba(255,255,255,0.03);
+}
+body {
+  min-height: max(884px, 100dvh);
+}
+.material-symbols-outlined {
+  font-size: 20px;
+}
+</style>
+</head>
+
+<body class="bg-background-light dark:bg-background-dark text-gray-900 dark:text-white antialiased min-h-screen flex justify-center items-center p-4">
+
+<div class="relative w-full max-w-[390px] h-[844px] bg-white dark:bg-background-dark rounded-[3rem] shadow-2xl overflow-hidden border-[8px] border-gray-100 dark:border-gray-800 flex flex-col">
+
+<div class="h-12 w-full flex justify-between items-center px-8 z-20">
+  <span class="text-sm font-semibold dark:text-white">9:41</span>
+  <div class="flex gap-1.5 items-center">
+    <span class="material-symbols-outlined">signal_cellular_alt</span>
+    <span class="material-symbols-outlined">wifi</span>
+    <span class="material-symbols-outlined">battery_full</span>
+  </div>
+</div>
+
+<div class="geometric-bg flex-1 flex flex-col px-8 relative overflow-hidden">
+  <div class="shape-layer layer-1"></div>
+  <div class="shape-layer layer-2"></div>
+
+  <div class="mt-16 mb-10 z-10">
+    <h1 class="text-4xl font-bold tracking-tight text-white">
+      Fin<span class="text-accent-green">CARE</span>
+    </h1>
+    <p class="text-gray-400 mt-2 text-sm font-medium">
+      "Socho Kam, <span class="text-accent-green">AI Sambhale Income</span>"
+    </p>
+  </div>
+
+  <div class="mb-8 z-10">
+    <h2 class="text-3xl font-bold text-white">
+      Welcome <span class="text-primary">Back!</span>
+    </h2>
+  </div>
+
+  <form onsubmit="handleLogin(event)" class="space-y-4 z-10">
+    <input id="loginEmail" required class="w-full bg-gray-800/50 border border-gray-700 text-white placeholder-gray-500 rounded-xl px-5 py-4 focus:ring-2 focus:ring-primary outline-none" placeholder="Email (Username)" type="email"/>
+
+    <div>
+      <input id="loginPassword" required class="w-full bg-gray-800/50 border border-gray-700 text-white placeholder-gray-500 rounded-xl px-5 py-4 focus:ring-2 focus:ring-primary outline-none" placeholder="Password" type="password"/>
+      <div class="text-right mt-2">
+        <a class="text-xs text-gray-500 hover:text-primary" href="#">forgot password?</a>
+      </div>
+    </div>
+
+    <button id="loginBtn" type="submit" class="w-full bg-primary hover:bg-yellow-500 text-gray-900 font-bold py-4 rounded-xl shadow-lg shadow-primary/20 transition-all active:scale-[0.98] flex items-center justify-center">
+      Login
+    </button>
+  </form>
+
+  <div class="flex items-center gap-4 py-4 z-10">
+    <div class="h-[1px] flex-1 bg-gray-800"></div>
+    <span class="text-xs text-gray-500">or login with</span>
+    <div class="h-[1px] flex-1 bg-gray-800"></div>
+  </div>
+
+  <a href="google_account_selection.html?from=login"
+     class="z-10 w-full bg-gray-800/40 border border-gray-700 hover:bg-gray-800/60 text-white font-medium py-4 rounded-xl flex items-center justify-center gap-3 transition-all">
+    <svg class="w-5 h-5" viewBox="0 0 24 24">
+      <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+      <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+      <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+      <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+    </svg>
+    Google
+  </a>
+
+  <div class="mt-auto mb-10 text-center z-10">
+    <p class="text-sm text-gray-400">
+      New here?
+      <a href="signup.html" class="text-white font-semibold hover:text-primary">
+        Create an Account
+      </a>
+    </p>
+  </div>
+
+  <div class="absolute bottom-2 left-1/2 -translate-x-1/2 w-32 h-1.5 bg-gray-700/50 rounded-full z-20"></div>
+</div>
+</div>
+
+</body>
+</html>
