@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>FinCARE - Signup</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,container-queries"></script>
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+    
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDGeRJkrzIjtM51OFu8_58nAlxAof0QK98",
+            authDomain: "fincare-project-4015e.firebaseapp.com",
+            databaseURL: "https://fincare-project-4015e-default-rtdb.firebaseio.com",
+            projectId: "fincare-project-4015e",
+            storageBucket: "fincare-project-4015e.firebasestorage.app",
+            messagingSenderId: "415209492661",
+            appId: "1:415209492661:web:683ea15a1e177fb4c52efc",
+            measurementId: "G-DNG4ZMXG1J"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        async function handleSignup(event) {
+            event.preventDefault();
+            const firstName = document.getElementById('firstName').value;
+            const lastName = document.getElementById('lastName').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const submitBtn = event.target.querySelector('button');
+
+            submitBtn.innerText = "Setting up account...";
+            submitBtn.disabled = true;
+
+            try {
+                // 1. User Create Karo
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+
+                // 2. Data save karo
+                await setDoc(doc(db, "users", user.uid), {
+                    firstName: firstName,
+                    lastName: lastName,
+                    email: email,
+                    onboardingComplete: false,
+                    currentStep: 0
+                });
+
+                // 3. JAISE HI DATA SAVE HO, TURANT STEP 1 PAR BHEJO
+                window.location.replace("step1.html");
+
+            } catch (error) {
+                alert("Error: " + error.message);
+                submitBtn.innerText = "Create Account";
+                submitBtn.disabled = false;
+            }
+        }
+        window.handleSignup = handleSignup;
+    </script>
+
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#FFC800",
+                        "background-light": "#F3F4F6",
+                        "background-dark": "#0A0C0E",
+                        "input-dark": "#1E2329",
+                    },
+                    fontFamily: { display: ["Inter", "sans-serif"] },
+                    borderRadius: { DEFAULT: "12px" },
+                },
+            },
+        };
+    </script>
+    <style type="text/tailwindcss">
+        body { font-family: 'Inter', sans-serif; @apply bg-background-dark; margin: 0; padding: 0; overflow-x: hidden; }
+        .geometric-bg { background-color: #000; position: relative; min-height: 100dvh; width: 100%; }
+        .geometric-shape { position: absolute; background: rgba(255, 255, 255, 0.03); transform: rotate(45deg); z-index: 0; }
+    </style>
+</head>
+<body class="antialiased text-white">
+<div class="geometric-bg flex flex-col w-full min-h-screen">
+    <div class="h-12 w-full flex justify-between px-8 items-end z-10 shrink-0">
+        <span class="text-sm font-semibold text-white">9:41</span>
+        <div class="flex gap-1 items-center">
+            <span class="material-symbols-outlined text-[18px]">signal_cellular_alt</span>
+            <span class="material-symbols-outlined text-[18px]">wifi</span>
+            <span class="material-symbols-outlined text-[18px]">battery_full</span>
+        </div>
+    </div>
+    
+    <div class="flex-1 px-8 pt-8 flex flex-col z-10 max-w-lg mx-auto w-full">
+        <header class="mb-8">
+            <h1 class="text-3xl font-bold">Create <span class="text-primary">Account</span></h1>
+        </header>
+
+        <form onsubmit="handleSignup(event)" class="space-y-4">
+            <div class="flex gap-4">
+                <input id="firstName" class="w-full bg-input-dark border-gray-700 rounded-xl px-4 py-4 text-white" placeholder="First Name" required type="text"/>
+                <input id="lastName" class="w-full bg-input-dark border-gray-700 rounded-xl px-4 py-4 text-white" placeholder="Last Name" required type="text"/>
+            </div>
+            <input id="email" class="w-full bg-input-dark border-gray-700 rounded-xl px-4 py-4 text-white" placeholder="Email" required type="email"/>
+            <input id="password" class="w-full bg-input-dark border-gray-700 rounded-xl px-4 py-4 text-white" placeholder="Password" required type="password"/>
+            <input id="confirmPassword" class="w-full bg-input-dark border-gray-700 rounded-xl px-4 py-4 text-white" placeholder="Confirm password" required type="password"/>
+            <button class="w-full bg-primary text-black font-bold py-4 rounded-xl mt-4" type="submit">
+                Create Account
+            </button>
+        </form>
+
+        <div class="mt-auto pb-10 text-center">
+            <p class="text-gray-400 text-sm">Already have an account? <a class="text-white font-semibold" href="login.html">login</a></p>
+        </div>
+    </div>
+</div>
+</body>
+</html>
